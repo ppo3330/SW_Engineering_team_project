@@ -3,7 +3,12 @@ import axios from 'axios';
 
 const WordManager = () => {
     const [words, setWords] = useState([]);
-    const [formData, setFormData] = useState({ word: '', meaning: '' });
+    const [formData, setFormData] = useState({ 
+        word: '', 
+        meaning: '', 
+        example: '',
+        difficulty: 0
+    });
     const [editingId, setEditingId] = useState(null); // 현재 수정 중인 단어 ID
 
     const API_URL = "http://localhost:8080/api/words";
@@ -32,14 +37,19 @@ const WordManager = () => {
             // Create: POST 요청
             await axios.post(API_URL, formData);
         }
-        setFormData({ word: '', meaning: '' });
+        setFormData({ word: '', meaning: '', example:'', difficulty:0});
         fetchWords();
     };
 
     // 4. 수정 모드 진입
     const handleEdit = (word) => {
         setEditingId(word.id);
-        setFormData({ word: word.word, meaning: word.meaning });
+        setFormData({ 
+            word: word.word, 
+            meaning: word.meaning,
+            example: word.example || '',
+            difficulty: word.difficulty || 0
+        });
     };
 
     // 5. 삭제 처리 (Delete)
@@ -55,15 +65,20 @@ const WordManager = () => {
             <h2>Word Tower 단어 관리</h2>
             
             {/* 입력/수정 폼 */}
-            <form onSubmit={handleSubmit} style={{ marginBottom: '20px' }}>
-                <input 
-                    name="word" value={formData.word} 
-                    onChange={handleChange} placeholder="단어" required 
-                />
-                <input 
-                    name="meaning" value={formData.meaning} 
-                    onChange={handleChange} placeholder="의미" required 
-                />
+            <form onSubmit={handleSubmit}>
+                <input name="word" value={formData.word} onChange={handleChange} placeholder="단어" required />
+                <input name="meaning" value={formData.meaning} onChange={handleChange} placeholder="의미" required />
+                
+                {/* 예문과 난이도 입력칸 추가 */}
+                <input name="example" value={formData.example} onChange={handleChange} placeholder="예문" />
+                <select name="difficulty" value={formData.difficulty} onChange={handleChange}>
+                    <option value="입문">입문 (0~200점)</option>
+                    <option value="초급">초급 (201~400점)</option>
+                    <option value="중급">중급 (401~600점)</option>
+                    <option value="상급">상급 (601~800점)</option>
+                    <option value="완성">완성 (801~990점)</option>
+                </select>
+
                 <button type="submit">
                     {editingId ? "수정 완료" : "단어 추가"}
                 </button>
@@ -76,6 +91,8 @@ const WordManager = () => {
                     <tr>
                         <th>단어</th>
                         <th>의미</th>
+                        <th>예문</th>
+                        <th>난이도</th>
                         <th>관리</th>
                     </tr>
                 </thead>
@@ -84,6 +101,8 @@ const WordManager = () => {
                         <tr key={w.id}>
                             <td>{w.word}</td>
                             <td>{w.meaning}</td>
+                            <td>{w.example}</td>
+                            <td>{w.difficulty}</td>
                             <td>
                                 <button onClick={() => handleEdit(w)}>수정</button>
                                 <button onClick={() => handleDelete(w.id)}>삭제</button>

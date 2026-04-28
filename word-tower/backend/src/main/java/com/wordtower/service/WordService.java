@@ -34,6 +34,9 @@ public class WordService {
         word.setWord(wordDetails.getWord());
         word.setMeaning(wordDetails.getMeaning());
 
+        word.setExample(wordDetails.getExample());       // 예문
+        word.setDifficulty(wordDetails.getDifficulty());
+
         return word;
 }
 
